@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 @Controller
-public class NewsController implements BaseController<NewsDtoReq, NewsDtoReq, Long> {
+public class NewsController implements BaseController<NewsDtoReq, NewsDtoRes, Long> {
 
     private final BaseService<NewsDtoReq, NewsDtoRes, Long> newsService;
 
@@ -21,22 +21,22 @@ public class NewsController implements BaseController<NewsDtoReq, NewsDtoReq, Lo
     }
 
     @Override
-    public List<NewsDtoReq> readAll() {
+    public List<NewsDtoRes> readAll() {
         return  newsService.readAll();
     }
 
     @Override
-    public NewsDtoReq readById(Long id) throws NotFoundException {
+    public NewsDtoRes readById(Long id) throws NotFoundException {
         return newsService.readById(id);
     }
 
     @Override
-    public NewsDtoReq create(NewsDtoReq createRequest) throws NotFoundException {
+    public NewsDtoRes create(NewsDtoReq createRequest) throws NotFoundException {
         return newsService.create(createRequest);
     }
 
     @Override
-    public NewsDtoReq update(NewsDtoReq updateRequest) throws NotFoundException {
+    public NewsDtoRes update(NewsDtoReq updateRequest) throws NotFoundException {
         return newsService.update(updateRequest);
     }
 
@@ -44,4 +44,8 @@ public class NewsController implements BaseController<NewsDtoReq, NewsDtoReq, Lo
     public boolean deleteById(Long id) throws NotFoundException {
         return newsService.deleteById(id);
     }
+
+
+
+
 }

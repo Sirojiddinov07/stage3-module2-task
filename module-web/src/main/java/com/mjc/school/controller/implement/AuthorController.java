@@ -10,8 +10,9 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
+
 @Controller
-public  class AuthorController implements BaseController<AuthorDtoReq, AuthorDtoReq, Long> {
+public class AuthorController implements BaseController<AuthorDtoReq, AuthorDtoRes, Long> {
     private final BaseService<AuthorDtoReq, AuthorDtoRes, Long> authorService;
 
     @Autowired
@@ -20,22 +21,22 @@ public  class AuthorController implements BaseController<AuthorDtoReq, AuthorDto
     }
 
     @Override
-    public List<AuthorDtoReq> readAll() {
+    public List<AuthorDtoRes> readAll() {
         return authorService.readAll();
     }
 
     @Override
-    public AuthorDtoReq readById(Long id) throws NotFoundException {
+    public AuthorDtoRes readById(Long id) throws NotFoundException {
         return authorService.readById(id);
     }
 
     @Override
-    public AuthorDtoReq create(AuthorDtoReq createRequest) throws NotFoundException {
+    public AuthorDtoRes create(AuthorDtoReq createRequest) throws NotFoundException {
         return authorService.create(createRequest);
     }
 
     @Override
-    public AuthorDtoReq update(AuthorDtoReq updateRequest) throws NotFoundException {
+    public AuthorDtoRes update(AuthorDtoReq updateRequest) throws NotFoundException {
         return authorService.update(updateRequest);
     }
 
