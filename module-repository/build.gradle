@@ -1,6 +1,5 @@
-dependencies{
-    implementation 'junit:junit:4.13.1'
-    implementation 'org.aspectj:aspectjweaver:1.9.19'
+dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
 }

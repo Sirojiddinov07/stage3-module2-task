@@ -1,18 +1,16 @@
 package com.mjc.school.controller;
 
-import com.mjc.school.service.exeptions.NotFoundException;
-
 import java.util.List;
 
 public interface BaseController<T, R, K> {
 
     List<R> readAll();
 
-    R readById(K id) throws NotFoundException;
+    R readById(K id);
 
-    R create(T createRequest) throws NotFoundException;
+    R create(T createRequest);
 
-    R update(T updateRequest) throws NotFoundException;
+    R update(T updateRequest);
 
-    boolean deleteById(K id) throws NotFoundException;
+    boolean deleteById(K id);
 }

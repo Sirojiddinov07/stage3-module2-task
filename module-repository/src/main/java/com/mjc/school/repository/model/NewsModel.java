@@ -1,18 +1,9 @@
 package com.mjc.school.repository.model;
 
-import com.mjc.school.repository.action.Default;
-import com.mjc.school.repository.model.BaseEntity;
-import lombok.Builder;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Scope("prototype")
-@Component
 
 public class NewsModel implements BaseEntity<Long> {
     private Long id;
@@ -22,12 +13,12 @@ public class NewsModel implements BaseEntity<Long> {
     private LocalDateTime lastUpdateDate;
     private Long authorId;
 
-    public NewsModel(Long id,
-                     String title,
-                     String content,
-                     LocalDateTime createDate,
-                     LocalDateTime lastUpdateDate,
-                     Long authorId) {
+    public NewsModel(Long id) {
+        this.id = id;
+    }
+
+    public NewsModel(Long id, String title, String content,
+                     LocalDateTime createDate, LocalDateTime lastUpdateDate, Long authorId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -36,21 +27,31 @@ public class NewsModel implements BaseEntity<Long> {
         this.authorId = authorId;
     }
 
-    public NewsModel(Long id, int i, String content, LocalDateTime initDate, LocalDateTime initDate1, Long id1) {
-    }
-    @Default
     public NewsModel() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        NewsModel newsModel = (NewsModel) o;
+        return id.equals(newsModel.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     @Override
     public Long getId() {
-        return this.id;
+        return null;
     }
 
     @Override
     public void setId(Long id) {
-        this.id = id;
 
     }
 
@@ -93,30 +94,4 @@ public class NewsModel implements BaseEntity<Long> {
     public void setAuthorId(Long authorId) {
         this.authorId = authorId;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        NewsModel newsModel = (NewsModel) o;
-        return Objects.equals(id, newsModel.id) && Objects.equals(title, newsModel.title) && Objects.equals(content, newsModel.content) && Objects.equals(createDate, newsModel.createDate) && Objects.equals(lastUpdateDate, newsModel.lastUpdateDate) && Objects.equals(authorId, newsModel.authorId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, content, createDate, lastUpdateDate, authorId);
-    }
-
-    @Override
-    public String toString() {
-        return "NewsModel{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", createDate=" + createDate +
-                ", lastUpdateDate=" + lastUpdateDate +
-                ", authorId=" + authorId +
-                '}';
-    }
 }
-
