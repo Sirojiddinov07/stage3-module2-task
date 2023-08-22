@@ -39,11 +39,10 @@ public class DataSource {
 
     private List<NewsModel> initNewsModels() {
         List<NewsModel> newsList = new ArrayList<>();
-        List<String> news;
-        news = Util.getRandomDate(PATH_NEWS);
+        List<String> news = Util.readResourceFile(PATH_NEWS);
         List<String> content = Util.readResourceFile(PATH_CONTENT);
         Long id = 1L;
-        for (int i = 0; i <DATA_SOURCE_SIZE; i++) {
+        for (int i = 0; i < DATA_SOURCE_SIZE; i++) {
             LocalDateTime initDate = Util.getRandomDate();
             newsList.add(
                     new NewsModel(id++,
@@ -56,11 +55,14 @@ public class DataSource {
         }
         return newsList;
     }
-    public List<NewsModel> getAllNews() {
-        return newsModels;
+        public List<NewsModel> getAllNews() {
+            return newsModels;
+        }
+
+        public List<AuthorModel> getAllAuthors() {
+            return authorModels;
+        }
     }
 
-    public List<AuthorModel> getAllAuthors() {
-        return authorModels;
-    }
-}
+
+

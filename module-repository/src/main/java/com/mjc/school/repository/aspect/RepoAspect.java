@@ -19,7 +19,7 @@ public class RepoAspect {
         this.dataSource = dataSource;
     }
 
-    @Before("@annotation(com.mjc.school.repository.action.OnDeleteCascade) && args(id)")
+    @Before("@annotation(com.mjc.school.repository.action.OneDelete) && args(id)")
     public void CascadeOnDelete(Long id){
         List<NewsModel> modelList = dataSource.getAllNews();
         List<NewsModel> removeList = modelList.stream()

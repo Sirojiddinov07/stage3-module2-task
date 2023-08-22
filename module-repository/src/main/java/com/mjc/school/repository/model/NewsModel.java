@@ -1,14 +1,19 @@
 package com.mjc.school.repository.model;
 
+import com.mjc.school.repository.action.Default;
 import com.mjc.school.repository.model.BaseEntity;
+import lombok.Builder;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Scope("prototype")
 @Component
+
 public class NewsModel implements BaseEntity<Long> {
     private Long id;
     private String title;
@@ -29,6 +34,12 @@ public class NewsModel implements BaseEntity<Long> {
         this.createDate = createDate;
         this.lastUpdateDate = lastUpdateDate;
         this.authorId = authorId;
+    }
+
+    public NewsModel(Long id, int i, String content, LocalDateTime initDate, LocalDateTime initDate1, Long id1) {
+    }
+    @Default
+    public NewsModel() {
     }
 
 
