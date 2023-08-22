@@ -3,6 +3,7 @@ package com.mjc.school.service.map;
 import com.mjc.school.repository.model.NewsModel;
 import com.mjc.school.service.dto.NewsDtoReq;
 
+import com.mjc.school.service.dto.NewsDtoRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -16,8 +17,8 @@ public interface CustomNewsMapper {
             @Mapping(target = "createDate", ignore = true),
             @Mapping(target = "lastUpdateDate", ignore = true)
     })
-    NewsModel mapDtoRequestToNewsModel(NewsDtoReq req);
+    NewsModel newsFromDtoRequest(NewsDtoReq req);
 
-    NewsDtoReq mapNewsModelToDtoResponse(NewsModel model);
+    NewsDtoRes newsToDtoResponse(NewsModel model);
 
 }

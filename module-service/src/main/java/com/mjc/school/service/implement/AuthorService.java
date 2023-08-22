@@ -16,58 +16,60 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
-public abstract class AuthorService implements BaseService<AuthorDtoRes, AuthorDtoRes> {
+public class AuthorService implements BaseService<AuthorDtoReq, AuthorDtoRes, Long> {
 
     public static final String AUTHOR = "Author";
 
     private final BaseRepository<AuthorModel, Long> authorRepository;
 
     @Autowired
-     public AuthorService(BaseRepository<AuthorModel, Long> authorRepository) {
+    public AuthorService(BaseRepository<AuthorModel, Long> authorRepository) {
         this.authorRepository = authorRepository;
-     }
-
-     @Override
-     public List<AuthorDtoRes> readAll() {
-        return authorRepository.readAll().stream().map(CustomAuthorMapper.INSTANCE::toAuthorDtoResponse).toList();
-
-     }
+    }
 
     @Override
-     @ValAuthorId
+    public List<AuthorDtoRes> readAll() {
+        return authorRepository.readAll().stream().map(CustomAuthorMapper.INSTANCE::authorToDtoResponse).toList();
+
+    }
+
+    @Override
+    @ValAuthorId
     public AuthorDtoRes readById(Long id) throws NotFoundException {
         Optional<AuthorModel> authorModel = authorRepository.readById(id);
         if (authorModel.isPresent()) {
-            return CustomAuthorMapper.INSTANCE.toAuthorDtoResponse(authorModel.get());
-         }
-         throw new NotFoundException(
-                 String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, id));
-     }
-
-     @Override
-     @ValAuthorParam
-     public AuthorDtoRes create(AuthorDtoRes createRequest) {
-         return CustomAuthorMapper.INSTANCE.toAuthorDtoResponse(
-                 authorRepository.create(CustomAuthorMapper.INSTANCE.toAuthorModel(createRequest)));
-     }
-
-     @Override
-     @ValAuthorParam
-     public AuthorDtoRes update(AuthorDtoRes updateRequest) throws NotFoundException {
-         if(authorRepository.existById(updateRequest.getId())){
-             AuthorModel updateAuthor = authorRepository.update(CustomAuthorMapper.INSTANCE.toAuthorModel(updateRequest));
-             return CustomAuthorMapper.INSTANCE.toAuthorDtoResponse(updateAuthor);
+            return CustomAuthorMapper.INSTANCE.authorToDtoResponse(authorModel.get());
         }
-         throw new NotFoundException(
-                 String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, updateRequest.getId()));
-     }
-     @Override
-     @ValAuthorId
-     public boolean deleteById(Long id) throws NotFoundException {
-         if(authorRepository.existById(id)){
-             return authorRepository.deleteById(id);
-         }
+        throw new NotFoundException(
+                String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, id));
+    }
+
+    @Override
+    @ValAuthorParam
+    public AuthorDtoRes create(AuthorDtoReq createRequest) {
+        return CustomAuthorMapper.INSTANCE.authorToDtoResponse(
+                authorRepository.create(CustomAuthorMapper.INSTANCE.authorFromDtoRequest(createRequest)));
+    }
+
+    @Override
+    @ValAuthorParam
+    public AuthorDtoRes update(AuthorDtoReq updateRequest) throws NotFoundException {
+        if(authorRepository.existById(updateRequest.getId())){
+            AuthorModel updateAuthor = authorRepository.update(CustomAuthorMapper.INSTANCE.authorFromDtoRequest(updateRequest));
+            return CustomAuthorMapper.INSTANCE.authorToDtoResponse(updateAuthor);
+        }
+        throw new NotFoundException(
+                String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, updateRequest.getId()));
+    }
+
+    @Override
+    @ValAuthorId
+    public boolean deleteById(Long id) throws NotFoundException {
+        if(authorRepository.existById(id)){
+            return authorRepository.deleteById(id);
+        }
         throw new NotFoundException(
                 String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, id));
     }

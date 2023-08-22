@@ -14,23 +14,23 @@ import org.springframework.stereotype.Component;
 public class ServiceAspect {
 
 
-    @Before("@annotation(com.mjc.school.service.annotation.ValidateAuthorId) && args(id)")
+    @Before("@annotation(com.mjc.school.service.actions.ValAuthorId) && args(id)")
     public void validateAuthorId(Long id) throws InvaliDataException {
         Validator.validateAuthorId(id);
     }
 
-    @Before("@annotation(com.mjc.school.service.annotation.ValidateAuthorParam) && args(request)")
+    @Before("@annotation(com.mjc.school.service.actions.ValAuthorParam) && args(request)")
     public void validateAuthorDto(AuthorDtoReq request) throws NotFoundException, InvaliDataException {
         Validator.validateAuthorDto(request);
 
     }
 
-    @Before("@annotation(com.mjc.school.service.annotation.ValidateNewsId) && args(id)")
+    @Before("@annotation(com.mjc.school.service.actions.ValNewsId) && args(id)")
     public void validateNewsId(Long id) throws InvaliDataException {
         Validator.validateAuthorId(id);
     }
 
-    @Before("@annotation(com.mjc.school.service.annotation.ValidateNewsParam) && args(request)")
+    @Before("@annotation(com.mjc.school.service.actions.ValNewsParam) && args(request)")
     public void validateNewsDto(NewsDtoReq request) throws NotFoundException, InvaliDataException {
         Validator.validateNewsDto(request);
 

@@ -7,15 +7,17 @@ import com.mjc.school.service.BaseService;
 import com.mjc.school.service.actions.ValNewsId;
 import com.mjc.school.service.actions.ValNewsParam;
 import com.mjc.school.service.dto.NewsDtoReq;
+import com.mjc.school.service.dto.NewsDtoRes;
 import com.mjc.school.service.exeptions.ErrorCodes;
 import com.mjc.school.service.exeptions.NotFoundException;
 import com.mjc.school.service.map.CustomNewsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
-public class NewsService implements BaseService<NewsDtoReq, Long> {
+@Service
+public class NewsService implements BaseService<NewsDtoReq, NewsDtoRes, Long> {
 
     public static final String AUTHOR = "Author";
     public static final String NEWS_ID = "News id";
@@ -31,16 +33,16 @@ public class NewsService implements BaseService<NewsDtoReq, Long> {
     }
 
     @Override
-    public List<NewsDtoReq> readAll() {
-        return newsRepository.readAll().stream().map(CustomNewsMapper.INSTANCE::mapNewsModelToDtoResponse).toList();
+    public List<NewsDtoRes> readAll() {
+        return newsRepository.readAll().stream().map(CustomNewsMapper.INSTANCE::newsToDtoResponse).toList();
     }
 
     @Override
     @ValNewsId
-    public NewsDtoReq readById(Long id) throws NotFoundException {
+    public NewsDtoRes readById(Long id) throws NotFoundException {
         Optional<NewsModel> newsModel = newsRepository.readById(id);
         if (newsModel.isPresent()) {
-            return CustomNewsMapper.INSTANCE.mapNewsModelToDtoResponse(newsModel.get());
+            return CustomNewsMapper.INSTANCE.newsToDtoResponse(newsModel.get());
         }
         throw new NotFoundException(
                 String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, id));
@@ -48,10 +50,10 @@ public class NewsService implements BaseService<NewsDtoReq, Long> {
 
     @Override
     @ValNewsParam
-    public NewsDtoReq create(NewsDtoReq createRequest) throws NotFoundException {
+    public NewsDtoRes create(NewsDtoReq createRequest) throws NotFoundException {
         if(authorRepository.existById(createRequest.getAuthorId())){
-            NewsModel newsModel = newsRepository.create(CustomNewsMapper.INSTANCE.mapDtoRequestToNewsModel(createRequest));
-            return CustomNewsMapper.INSTANCE.mapNewsModelToDtoResponse(newsModel);
+            NewsModel newsModel = newsRepository.create(CustomNewsMapper.INSTANCE.newsFromDtoRequest(createRequest));
+            return CustomNewsMapper.INSTANCE.newsToDtoResponse(newsModel);
         }
         throw new NotFoundException(
                 String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), AUTHOR, createRequest.getAuthorId()));
@@ -59,10 +61,10 @@ public class NewsService implements BaseService<NewsDtoReq, Long> {
 
     @Override
     @ValNewsParam
-    public NewsDtoReq update(NewsDtoReq updateRequest) throws NotFoundException {
+    public NewsDtoRes update(NewsDtoReq updateRequest) throws NotFoundException {
         if(newsRepository.existById(updateRequest.getId())){
-            NewsModel newsModel = newsRepository.update(CustomNewsMapper.INSTANCE.mapDtoRequestToNewsModel(updateRequest));
-            return CustomNewsMapper.INSTANCE.INSTANCE.mapNewsModelToDtoResponse(newsModel);
+            NewsModel newsModel = newsRepository.update(CustomNewsMapper.INSTANCE.newsFromDtoRequest(updateRequest));
+            return CustomNewsMapper.INSTANCE.newsToDtoResponse(newsModel);
         }
         throw new NotFoundException(
                 String.format(ErrorCodes.NOT_FOUND_DATA.getMessage(), NEWS_ID, updateRequest.getId()));

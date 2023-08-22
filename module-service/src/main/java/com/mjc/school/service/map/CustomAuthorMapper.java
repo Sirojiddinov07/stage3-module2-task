@@ -1,6 +1,7 @@
 package com.mjc.school.service.map;
 
 import com.mjc.school.repository.model.AuthorModel;
+import com.mjc.school.service.dto.AuthorDtoReq;
 import com.mjc.school.service.dto.AuthorDtoRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,8 +14,10 @@ public interface CustomAuthorMapper {
 
 
 
+
     @Mappings(value = {@Mapping(target = "createDate", ignore = true),
             @Mapping(target = "lastUpdateDate", ignore = true)})
-    AuthorModel toAuthorModel(AuthorDtoRes request);
-    AuthorDtoRes toAuthorDtoResponse(AuthorModel model);
+    AuthorModel authorFromDtoRequest(AuthorDtoReq request);
+    AuthorDtoRes authorToDtoResponse(AuthorModel model);
+
 }

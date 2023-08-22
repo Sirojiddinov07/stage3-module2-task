@@ -1,8 +1,10 @@
 package com.mjc.school.service.dto;
 
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
-
+@Component
 public class NewsDtoReq {
     private Long id;
     private String title;
