@@ -27,25 +27,24 @@ public class DataSource {
 
     private List<AuthorModel> initAuthorModels() {
         List<AuthorModel> authors = new ArrayList<>();
-        List<String> authorsNames = Util.readResFile(PATH_AUTHOR);
+        List<String> authorsNames = Util.readResourceFile(PATH_AUTHOR);
         Long id = 1L;
-        for (int i = 0; i < DATA_SOURCE_SIZE; i++) {
-            LocalDateTime initDate = Util.getRandomTime();
-            authors.add(new AuthorModel(id++
-                    ,authorsNames.get(i),
-                    initDate,
-                    initDate));
+        for (int i = 0; i <DATA_SOURCE_SIZE; i++) {
+            LocalDateTime initDate = Util.getRandomDate();
+            authors.add(new AuthorModel(
+            ));
         }
         return authors;
     }
 
     private List<NewsModel> initNewsModels() {
         List<NewsModel> newsList = new ArrayList<>();
-        List<String> news = Util.readResFile(PATH_NEWS);
-        List<String> content = Util.readResFile(PATH_CONTENT);
+        List<String> news;
+        news = Util.getRandomDate(PATH_NEWS);
+        List<String> content = Util.readResourceFile(PATH_CONTENT);
         Long id = 1L;
         for (int i = 0; i <DATA_SOURCE_SIZE; i++) {
-            LocalDateTime initDate = Util.getRandomTime();
+            LocalDateTime initDate = Util.getRandomDate();
             newsList.add(
                     new NewsModel(id++,
                             news.get(i),

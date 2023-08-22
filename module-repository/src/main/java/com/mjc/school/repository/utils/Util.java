@@ -14,7 +14,7 @@ import java.util.Random;
 public class Util {
     private Util(){
     }
-    public static List<String> readResFile(String path) {
+    public static List<String> readResourceFile(String path) {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream inputStream = classloader.getResourceAsStream(path);
         List<String> listData = new ArrayList<>();
@@ -29,7 +29,7 @@ public class Util {
         return listData;
     }
 
-    public static LocalDateTime getRandomTime() {
+    public static LocalDateTime getRandomDate() {
         Random random = new Random();
         int endDay = 30;
         LocalDate day = LocalDate.now().plusDays(random.nextInt(endDay));
