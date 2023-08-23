@@ -1,67 +1,60 @@
 package com.mjc.school.repository.impl;
 
 import com.mjc.school.repository.BaseRepository;
+import com.mjc.school.repository.data.NewsDataSource;
 import com.mjc.school.repository.model.NewsModel;
-import com.mjc.school.repository.utils.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 @Repository
 public class NewsRepository implements BaseRepository<NewsModel, Long> {
+    private final NewsDataSource newsDataSource;
 
-    private final DataSource dataSource = new DataSource();
-
-    public NewsRepository() throws IOException {
+    @Autowired
+    public NewsRepository(NewsDataSource newsDataSource) {
+        this.newsDataSource = newsDataSource;
     }
 
     @Override
     public List<NewsModel> readAll() {
-        return dataSource.getNewsModelList();
+        return newsDataSource.getNewsList();
     }
 
     @Override
     public Optional<NewsModel> readById(Long id) {
-        return dataSource.getNewsModelList().stream()
-                .filter(news -> id.equals(news.getId()))
-                .findFirst();
+        return newsDataSource.getNewsList().stream().filter(x -> x.getId().equals(id)).findFirst();
     }
 
     @Override
-    public NewsModel create(NewsModel newNews) {
-        List<NewsModel> newsList = dataSource.getNewsModelList();
-        newsList.sort(Comparator.comparing(NewsModel::getId));
-        if (!newsList.isEmpty()) {
-            newNews.setId(newsList.get(newsList.size() - 1).getId() + 1);
-        } else {
-            newNews.setId(1L);
+    public NewsModel create(NewsModel entity) {
+        entity.setId(newsDataSource.getNewsList().size() + 1L);
+        newsDataSource.getNewsList().add(entity);
+        return entity;
+    }
+
+    @Override
+    public NewsModel update(NewsModel entity) {
+        Optional<NewsModel> newsOptional = readById(entity.getId());
+        if (newsOptional.isEmpty()) {
+            return null;
         }
-        newsList.add(newNews);
-        return newNews;
-    }
-
-    @Override
-    public NewsModel update(NewsModel newsModel) {
-        NewsModel newsModelFromRepo = readById(newsModel.getId()).get();
-        newsModelFromRepo.setTitle(newsModel.getTitle());
-        newsModelFromRepo.setContent(newsModel.getContent());
-        newsModelFromRepo.setAuthorId(newsModel.getAuthorId());
-        newsModelFromRepo.setLastUpdateDate(LocalDateTime.now());
-        return newsModelFromRepo;
+        NewsModel model = newsOptional.get();
+        model.setTitle(entity.getTitle());
+        model.setContent(entity.getContent());
+        model.setLastUpdateDate(entity.getLastUpdateDate());
+        model.setAuthorId(entity.getAuthorId());
+        return model;
     }
 
     @Override
     public boolean deleteById(Long id) {
-        return dataSource.getNewsModelList().remove(new NewsModel(id));
+        return newsDataSource.getNewsList().removeIf(x -> x.getId().equals(id));
     }
 
     @Override
     public boolean existById(Long id) {
-        int indexOfNews = dataSource.getNewsModelList().indexOf(new NewsModel(id));
-        return indexOfNews != -1;
+        return newsDataSource.getNewsList().stream().anyMatch(x -> x.getId().equals(id));
     }
 }

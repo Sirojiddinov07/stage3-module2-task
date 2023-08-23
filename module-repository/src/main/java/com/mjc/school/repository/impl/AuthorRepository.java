@@ -1,65 +1,63 @@
 package com.mjc.school.repository.impl;
 
 import com.mjc.school.repository.BaseRepository;
-import com.mjc.school.repository.model.Author;
-import com.mjc.school.repository.utils.DataSource;
+import com.mjc.school.repository.OnDelete;
+import com.mjc.school.repository.data.AuthorsDataSource;
+import com.mjc.school.repository.model.AuthorModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 @Repository
-public class AuthorRepository implements BaseRepository<Author, Long> {
+public class AuthorRepository implements BaseRepository<AuthorModel, Long> {
+    private final AuthorsDataSource authorsDataSource;
 
-    private final DataSource dataSource = new DataSource();
+    @Autowired
+    public AuthorRepository(AuthorsDataSource authorsDataSource) {
+        this.authorsDataSource = authorsDataSource;
+    }
 
-    public AuthorRepository() throws IOException {
+
+    @Override
+    public List<AuthorModel> readAll() {
+        return authorsDataSource.getAuthorList();
     }
 
     @Override
-    public List<Author> readAll() {
-        return dataSource.getAuthorList();
+    public Optional<AuthorModel> readById(Long id) {
+        return authorsDataSource.getAuthorList().stream().filter(x -> x.getId().equals(id)).findFirst();
     }
 
     @Override
-    public Optional<Author> readById(Long id) {
-        return dataSource.getAuthorList().stream()
-                .filter(news -> id.equals(news.getId()))
-                .findFirst();
+    public AuthorModel create(AuthorModel entity) {
+        long maxId = authorsDataSource.getAuthorList().stream().mapToLong(AuthorModel::getId).max().orElse(0);
+        entity.setId(maxId + 1);
+        authorsDataSource.getAuthorList().add(entity);
+        return entity;
     }
 
     @Override
-    public Author create(Author newAuthor) {
-        List<Author> authorList = dataSource.getAuthorList();
-        authorList.sort(Comparator.comparing(Author::getId));
-        if (!authorList.isEmpty()) {
-            newAuthor.setId(authorList.get(authorList.size() - 1).getId() + 1);
-        } else {
-            newAuthor.setId(1L);
+    public AuthorModel update(AuthorModel entity) {
+        Optional<AuthorModel> authorOptional = readById(entity.getId());
+        if (authorOptional.isEmpty()) {
+            return null;
         }
-        authorList.add(newAuthor);
-        return newAuthor;
+        AuthorModel authorModel = authorOptional.get();
+        authorModel.setName(entity.getName());
+        authorModel.setLastUpdateDate(entity.getLastUpdateDate());
+        return authorModel;
     }
 
-    @Override
-    public Author update(Author author) {
-        Author authorFromRepo = readById(author.getId()).get();
-        authorFromRepo.setName(author.getName());
-        authorFromRepo.setLastUpdateDate(LocalDateTime.now());
-        return authorFromRepo;
-    }
 
     @Override
+    @OnDelete
     public boolean deleteById(Long id) {
-        return dataSource.getAuthorList().remove(new Author(id));
+        return authorsDataSource.getAuthorList().removeIf(x -> x.getId().equals(id));
     }
 
     @Override
     public boolean existById(Long id) {
-        int indexOfAuthor = dataSource.getAuthorList().indexOf(new Author(id));
-        return indexOfAuthor != -1;
+        return authorsDataSource.getAuthorList().stream().anyMatch(x -> x.getId().equals(id));
     }
 }

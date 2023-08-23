@@ -1,24 +1,10 @@
 package com.mjc.school.repository.model;
 
-
 import java.time.LocalDateTime;
-import java.util.Objects;
 
+public class NewsModel implements BaseEntity<Long>{
 
-public class NewsModel implements BaseEntity<Long> {
-    private Long id;
-    private String title;
-    private String content;
-    private LocalDateTime createDate;
-    private LocalDateTime lastUpdateDate;
-    private Long authorId;
-
-    public NewsModel(Long id) {
-        this.id = id;
-    }
-
-    public NewsModel(Long id, String title, String content,
-                     LocalDateTime createDate, LocalDateTime lastUpdateDate, Long authorId) {
+    public NewsModel(Long id, String title, String content, LocalDateTime createDate, LocalDateTime lastUpdateDate, Long authorId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -27,33 +13,11 @@ public class NewsModel implements BaseEntity<Long> {
         this.authorId = authorId;
     }
 
-    public NewsModel() {
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        NewsModel newsModel = (NewsModel) o;
-        return id.equals(newsModel.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public Long getId() {
-        return null;
-    }
-
-    @Override
-    public void setId(Long id) {
-
-    }
+    private Long id;
+    private String title,content;
+    private LocalDateTime createDate;
+    private LocalDateTime lastUpdateDate;
+    private Long authorId;
 
     public String getTitle() {
         return title;
@@ -93,5 +57,26 @@ public class NewsModel implements BaseEntity<Long> {
 
     public void setAuthorId(Long authorId) {
         this.authorId = authorId;
+    }
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "NewsModel{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", createDate=" + createDate +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", authorId=" + authorId +
+                '}';
     }
 }
