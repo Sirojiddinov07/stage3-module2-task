@@ -1,79 +1,69 @@
 package com.mjc.school.service.impl;
 
 import com.mjc.school.repository.BaseRepository;
-import com.mjc.school.repository.model.Author;
-import com.mjc.school.repository.model.NewsModel;
+import com.mjc.school.repository.model.AuthorModel;
 import com.mjc.school.service.BaseService;
-import com.mjc.school.service.dto.ServiceAuthorRequestDto;
-import com.mjc.school.service.dto.ServiceAuthorResponseDto;
-import com.mjc.school.service.mapper.AuthorMapper;
-import com.mjc.school.service.validator.annotations.ValidateInput;
+import com.mjc.school.service.dto.AuthorRequestDTO;
+import com.mjc.school.service.dto.AuthorResponseDTO;
+import com.mjc.school.service.exception.ErrorCodes;
+import com.mjc.school.service.exception.NotFoundException;
+import com.mjc.school.service.mapper.AuthorModelMapper;
+import com.mjc.school.service.validator.NewsValidator;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
-public class AuthorService implements BaseService<ServiceAuthorRequestDto, ServiceAuthorResponseDto, Long> {
+public class AuthorService implements BaseService<AuthorRequestDTO, AuthorResponseDTO, Long> {
+    private final BaseRepository<AuthorModel, Long> authorRepository;
+    private final NewsValidator validator;
+    private final AuthorModelMapper mapper = Mappers.getMapper(AuthorModelMapper.class);
 
-    private final AuthorMapper mapper = new AuthorMapper();
-
-    private final BaseRepository<Author, Long> authorRepository;
-
-    private final BaseRepository<NewsModel, Long> newsRepository;
-
-
-    public AuthorService(BaseRepository<Author, Long> authorRepository,
-                         BaseRepository<NewsModel, Long> newsRepository) {
+    @Autowired
+    public AuthorService(BaseRepository<AuthorModel, Long> authorRepository, NewsValidator validator) {
         this.authorRepository = authorRepository;
-        this.newsRepository = newsRepository;
+        this.validator = validator;
     }
 
     @Override
-    public List<ServiceAuthorResponseDto> readAll() {
-        List<ServiceAuthorResponseDto> serviceAuthorResponseDtoList = new ArrayList<>();
-        for (Author author : authorRepository.readAll()) {
-            serviceAuthorResponseDtoList.add(mapper.mapModelToResponseDto(author));
-        }
-        return serviceAuthorResponseDtoList;
+    public List<AuthorResponseDTO> readAll() {
+        return mapper.modelListToDtoList(authorRepository.readAll());
     }
 
     @Override
-    @ValidateInput
-    public ServiceAuthorResponseDto readById(Long id) {
-        Author author = authorRepository.readById(id).get();
-        return mapper.mapModelToResponseDto(author);
+    public AuthorResponseDTO readById(Long id) {
+        AuthorModel dto = authorRepository.readById(id).orElseThrow(() -> new NotFoundException(String.format(ErrorCodes.AUTHOR_NOT_EXIST.getMessage(), id)));
+        return mapper.modelToDTO(dto);
     }
 
     @Override
-    @ValidateInput
-    public ServiceAuthorResponseDto create(ServiceAuthorRequestDto serviceAuthorRequestDto) {
-        ServiceAuthorResponseDto newAuthor =
-                new ServiceAuthorResponseDto(
-                        null,
-                        serviceAuthorRequestDto.getName(),
-                        LocalDateTime.now(),
-                        LocalDateTime.now());
-        return mapper.mapModelToResponseDto(authorRepository.create(
-                mapper.mapResponseDtoToModel(newAuthor)
-        ));
+    public AuthorResponseDTO create(AuthorRequestDTO createRequest) {
+        validator.checkAuthorDto(createRequest);
+        AuthorModel model = mapper.dtoToModel(createRequest);
+        LocalDateTime current = LocalDateTime.now().withNano(0);
+        model.setLastUpdateDate(current);
+        model.setCreateDate(current);
+        AuthorModel newModel = authorRepository.create(model);
+        return mapper.modelToDTO(newModel);
     }
 
     @Override
-    @ValidateInput
-    public ServiceAuthorResponseDto update(ServiceAuthorRequestDto authorUpdateRequest) {
-        return mapper.mapModelToResponseDto(
-                authorRepository.update(
-                        mapper.mapRequestDtoToModel(authorUpdateRequest)
-                ));
+    public AuthorResponseDTO update(AuthorRequestDTO updateRequest) {
+        validator.checkAuthorDto(updateRequest);
+        AuthorModel model = mapper.dtoToModel(updateRequest);
+        model.setLastUpdateDate(LocalDateTime.now().withNano(0));
+        AuthorModel updatedModel = authorRepository.update(model);
+        return mapper.modelToDTO(updatedModel);
     }
 
     @Override
-    @ValidateInput
     public boolean deleteById(Long id) {
-        newsRepository.readAll().removeIf(news -> Objects.equals(news.getAuthorId(), id));
-        return authorRepository.deleteById(id);
+        if (authorRepository.existById(id)){
+            return authorRepository.deleteById(id);
+        } else throw new NotFoundException(String.format(ErrorCodes.AUTHOR_NOT_EXIST.getMessage(), id));
     }
+
 }

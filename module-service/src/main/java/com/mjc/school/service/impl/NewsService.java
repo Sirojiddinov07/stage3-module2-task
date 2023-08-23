@@ -3,73 +3,73 @@ package com.mjc.school.service.impl;
 import com.mjc.school.repository.BaseRepository;
 import com.mjc.school.repository.model.NewsModel;
 import com.mjc.school.service.BaseService;
-import com.mjc.school.service.dto.ServiceNewsRequestDto;
-import com.mjc.school.service.dto.ServiceNewsResponseDto;
-import com.mjc.school.service.mapper.NewsMapper;
-import com.mjc.school.service.validator.annotations.ValidateInput;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.mjc.school.service.dto.NewsRequestDTO;
+import com.mjc.school.service.dto.NewsResponseDTO;
+import com.mjc.school.service.exception.ErrorCodes;
+import com.mjc.school.service.exception.NotFoundException;
+import com.mjc.school.service.mapper.NewsModelMapper;
+import com.mjc.school.service.validator.NewsValidator;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class NewsService implements BaseService<ServiceNewsRequestDto, ServiceNewsResponseDto, Long> {
-
-    private final NewsMapper mapper = new NewsMapper();
-
+public class NewsService implements BaseService<NewsRequestDTO, NewsResponseDTO, Long> {
     private final BaseRepository<NewsModel, Long> newsRepository;
+    private final NewsModelMapper newsMapper = Mappers.getMapper(NewsModelMapper.class);
+    private final NewsValidator validator;
 
-    public NewsService(@Qualifier("newsRepository")
-                       BaseRepository<NewsModel, Long> newsRepository) {
+    @Autowired
+    public NewsService(BaseRepository<NewsModel, Long> newsRepository, NewsValidator validator){
         this.newsRepository = newsRepository;
+        this.validator = validator;
     }
 
     @Override
-    public List<ServiceNewsResponseDto> readAll() {
-        List<ServiceNewsResponseDto> newsDtoList = new ArrayList<>();
-        for (NewsModel newsModel : newsRepository.readAll()) {
-            newsDtoList.add(mapper.mapModelToResponseDto(newsModel));
-        }
-        return newsDtoList;
+    public List<NewsResponseDTO> readAll() {
+        return newsMapper.modelListToDtoList(newsRepository.readAll());
     }
 
     @Override
-    @ValidateInput
-    public ServiceNewsResponseDto readById(Long id) {
-        NewsModel newsModel = newsRepository.readById(id).get();
-        return mapper.mapModelToResponseDto(newsModel);
+    public NewsResponseDTO readById(Long id) {
+        checkNewsExist(id);
+        NewsModel model = newsRepository.readById(id).get();
+        return newsMapper.modelToDTO(model);
     }
 
     @Override
-    @ValidateInput
-    public ServiceNewsResponseDto create(ServiceNewsRequestDto news) {
-        ServiceNewsResponseDto newNews =
-                new ServiceNewsResponseDto(
-                        null,
-                        news.getTitle(),
-                        news.getContent(),
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        news.getAuthorId());
-        return mapper.mapModelToResponseDto(newsRepository.create(
-                mapper.mapResponseDtoToModel(newNews)
-        ));
+    public NewsResponseDTO create(NewsRequestDTO createRequest) {
+        validator.checkNewsDto(createRequest);
+        NewsModel model = newsMapper.dtoToModel(createRequest);
+        LocalDateTime currentTime = LocalDateTime.now().withNano(0);
+        model.setCreateDate(currentTime);
+        model.setLastUpdateDate(currentTime);
+        NewsModel newModel = newsRepository.create(model);
+        return newsMapper.modelToDTO(newModel);
     }
 
     @Override
-    @ValidateInput
-    public ServiceNewsResponseDto update(ServiceNewsRequestDto news) {
-        return mapper.mapModelToResponseDto(
-                newsRepository.update(
-                        mapper.mapRequestDtoToModel(news)
-                ));
+    public NewsResponseDTO update(NewsRequestDTO updateRequest) {
+        validator.checkNewsDto(updateRequest);
+        NewsModel model = newsMapper.dtoToModel(updateRequest);
+        model.setLastUpdateDate(LocalDateTime.now().withNano(0));
+        NewsModel updatedModel = newsRepository.update(model);
+
+        return newsMapper.modelToDTO(updatedModel);
     }
 
     @Override
-    @ValidateInput
     public boolean deleteById(Long id) {
+        checkNewsExist(id);
         return newsRepository.deleteById(id);
+    }
+
+    private void checkNewsExist(Long id){
+        if (!newsRepository.existById(id)){
+            throw new NotFoundException(String.format(ErrorCodes.NEWS_NOT_EXIST.getMessage(),id));
+        }
     }
 }
