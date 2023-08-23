@@ -1,61 +1,49 @@
 package com.mjc.school.controller.impl;
 
 import com.mjc.school.controller.BaseController;
-import com.mjc.school.controller.CommandHandler;
-import com.mjc.school.controller.dto.NewsRequestDto;
-import com.mjc.school.controller.dto.NewsResponseDto;
-import com.mjc.school.controller.mapper.ServiceToWebDTOMapper;
 import com.mjc.school.service.BaseService;
-import com.mjc.school.service.dto.ServiceNewsRequestDto;
-import com.mjc.school.service.dto.ServiceNewsResponseDto;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.mjc.school.service.dto.NewsRequestDTO;
+import com.mjc.school.service.dto.NewsResponseDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
 import java.util.List;
-
 @Controller
-public class NewsController implements BaseController<NewsRequestDto, NewsResponseDto, Long> {
-    private final BaseService<ServiceNewsRequestDto, ServiceNewsResponseDto, Long> newsService;
+public class NewsController implements BaseController<NewsRequestDTO, NewsResponseDTO, Long> {
+    private final BaseService<NewsRequestDTO, NewsResponseDTO, Long> newsService;
 
-    private final ServiceToWebDTOMapper mapper = new ServiceToWebDTOMapper();
-
-    public NewsController(
-            @Qualifier("newsService")
-            BaseService<ServiceNewsRequestDto, ServiceNewsResponseDto, Long> newsService
-    ) {
+    @Autowired
+    public NewsController(BaseService<NewsRequestDTO, NewsResponseDTO, Long> newsService) {
         this.newsService = newsService;
     }
 
-    @CommandHandler(code = 1)
-    public List<NewsResponseDto> readAll() {
-        List<NewsResponseDto> newsResponseDtoList = new ArrayList<>();
-        for (ServiceNewsResponseDto serviceDto : newsService.readAll()) {
-            newsResponseDtoList.add(mapper.mapServiceNewsResponseDto(serviceDto));
-        }
-        return newsResponseDtoList;
+
+    @Override
+    public List<NewsResponseDTO> readAll() {
+        return newsService.readAll();
     }
 
-    @CommandHandler(code = 2)
-    public NewsResponseDto readById(Long newsId) {
-        return mapper.mapServiceNewsResponseDto(
-                newsService.readById(newsId));
+
+    @Override
+    public NewsResponseDTO readById(Long id) {
+        return newsService.readById(id);
     }
 
-    @CommandHandler(code = 3)
-    public NewsResponseDto create(NewsRequestDto dtoRequest) {
-        return mapper.mapServiceNewsResponseDto(
-                newsService.create(mapper.mapNewsRequestDto(dtoRequest)));
+
+    @Override
+    public NewsResponseDTO create(NewsRequestDTO createRequest) {
+        return newsService.create(createRequest);
     }
 
-    @CommandHandler(code = 4)
-    public NewsResponseDto update(NewsRequestDto dtoRequest) {
-        return mapper.mapServiceNewsResponseDto(
-                newsService.update(mapper.mapNewsRequestDto(dtoRequest)));
+
+    @Override
+    public NewsResponseDTO update(NewsRequestDTO updateRequest) {
+        return newsService.update(updateRequest);
     }
 
-    @CommandHandler(code = 5)
-    public boolean deleteById(Long newsId) {
-        return newsService.deleteById(newsId);
+
+    @Override
+    public boolean deleteById(Long id) {
+        return newsService.deleteById(id);
     }
 }
