@@ -11,9 +11,11 @@ import java.util.List;
 
 @Mapper
 public interface NewsModelMapper {
-    NewsResponseDTO modelToDTO(NewsModel newsModel);
-    List<NewsResponseDTO> modelListToDtoList (List<NewsModel> newsList);
+
     @Mappings(value = { @Mapping(target = "createDate", ignore = true),
                         @Mapping(target = "lastUpdateDate", ignore = true)})
     NewsModel dtoToModel (NewsRequestDTO requestDTO);
+
+    NewsResponseDTO modelToDTO(NewsModel newsModel);
+    List<NewsResponseDTO> modelListToDtoList (List<NewsModel> newsList);
 }

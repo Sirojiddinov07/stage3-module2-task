@@ -7,6 +7,8 @@ import com.mjc.school.service.exception.NotFoundException;
 import com.mjc.school.service.exception.ValidatorException;
 import org.springframework.stereotype.Component;
 
+import javax.management.Query;
+
 @Component
 public class NewsValidator {
 
